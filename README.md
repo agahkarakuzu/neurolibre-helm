@@ -3,7 +3,7 @@
 * Make sure that you have CRD for `cert-manager` `v0.11.1`. 
 
 ```
-kubectl apply --validate=false -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.11/deploy/manifests/00-crds.yaml
+kubectl apply --validate=false -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.12/deploy/manifests/00-crds.yaml
 ```
 
 With `cert-manager > v0.11.0`, use the following `API version` in `clusterissuer.yaml`: 
@@ -68,6 +68,7 @@ helm package neurolibre-chart
 ## To delete 
 ```
 helm del --purge neurolibre
+kubectl delete pv hub-db-dir
 ```
 
 
