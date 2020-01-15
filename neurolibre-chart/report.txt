@@ -1,0 +1,127 @@
+kubectl get pods -n binderhub
+
+binder-756b479556-ddk65                                    1/1     Running   0          8h
+cm-acme-http-solver-qzt2f                                  1/1     Running   0          8h
+continuous-image-puller-5cf2p                              1/1     Running   0          8h
+continuous-image-puller-5kcll                              1/1     Running   0          8h
+hub-5578c5b89b-w5xdj                                       0/1     Pending   0          8h
+neurolibre-cainjector-b859cdfc8-pgrh2                      1/1     Running   0          8h
+neurolibre-cert-manager-5b79668d98-lfq6g                   1/1     Running   0          8h
+neurolibre-cert-manager-webhook-7dcd9f8ccb-nd48f           1/1     Running   0          8h
+neurolibre-image-cleaner-vmp9z                             1/1     Running   0          8h
+neurolibre-image-cleaner-w95sw                             1/1     Running   0          8h
+neurolibre-nginx-ingress-controller-77cc6bdccb-kt4fw       1/1     Running   0          8h
+neurolibre-nginx-ingress-default-backend-b9d79d866-twq28   1/1     Running   0          8h
+proxy-565bf6794b-6stbl                                     0/1     Pending   0          8h
+user-placeholder-0                                         0/1     Pending   0          8h
+user-placeholder-1                                         0/1     Pending   0          8h
+user-placeholder-2                                         0/1     Pending   0          8h
+user-scheduler-746cc75bff-lhsx5                            0/1     Pending   0          8h
+user-scheduler-746cc75bff-rgn5f                            0/1     Pending   0          8h
+
+kubectl describe pods -n binderhub hub-5578c5b89b-w5xdj
+
+Name:               hub-5578c5b89b-w5xdj
+Namespace:          binderhub
+Priority:           0
+PriorityClassName:  neurolibre-default-priority
+Node:               <none>
+Labels:             app=jupyterhub
+                    component=hub
+                    hub.jupyter.org/network-access-proxy-api=true
+                    hub.jupyter.org/network-access-proxy-http=true
+                    hub.jupyter.org/network-access-singleuser=true
+                    pod-template-hash=5578c5b89b
+                    release=neurolibre
+Annotations:        checksum/config-map: 0ca1dc2bf74551684c9c9bb093407b03078dffa408841c7fb149e57d173ffa0c
+                    checksum/secret: 3ceecf6d4b3bedfa82add85065167f4305c0253cf688e7e88c360299ffc5df65
+Status:             Pending
+IP:                 
+Controlled By:      ReplicaSet/hub-5578c5b89b
+Containers:
+  hub:
+    Image:      jupyterhub/k8s-hub:0.9.0-beta.2
+    Port:       8081/TCP
+    Host Port:  0/TCP
+    Command:
+      jupyterhub
+      --config
+      /etc/jupyterhub/jupyterhub_config.py
+      --upgrade-db
+    Requests:
+      cpu:      200m
+      memory:   512Mi
+    Readiness:  http-get http://:hub/hub/health delay=0s timeout=1s period=10s #success=1 #failure=3
+    Environment:
+      PYTHONUNBUFFERED:        1
+      HELM_RELEASE_NAME:       neurolibre
+      POD_NAMESPACE:           binderhub (v1:metadata.namespace)
+      CONFIGPROXY_AUTH_TOKEN:  <set to the key 'proxy.token' in secret 'hub-secret'>  Optional: false
+    Mounts:
+      /etc/jupyterhub/config/ from config (rw)
+      /etc/jupyterhub/cull_idle_servers.py from config (rw,path="cull_idle_servers.py")
+      /etc/jupyterhub/jupyterhub_config.py from config (rw,path="jupyterhub_config.py")
+      /etc/jupyterhub/secret/ from secret (rw)
+      /etc/jupyterhub/z2jh.py from config (rw,path="z2jh.py")
+      /srv/jupyterhub from hub-db-dir (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from hub-token-ch2kx (ro)
+Conditions:
+  Type           Status
+  PodScheduled   False 
+Volumes:
+  config:
+    Type:      ConfigMap (a volume populated by a ConfigMap)
+    Name:      hub-config
+    Optional:  false
+  secret:
+    Type:        Secret (a volume populated by a Secret)
+    SecretName:  hub-secret
+    Optional:    false
+  hub-db-dir:
+    Type:       PersistentVolumeClaim (a reference to a PersistentVolumeClaim in the same namespace)
+    ClaimName:  hub-db-dir
+    ReadOnly:   false
+  hub-token-ch2kx:
+    Type:        Secret (a volume populated by a Secret)
+    SecretName:  hub-token-ch2kx
+    Optional:    false
+QoS Class:       Burstable
+Node-Selectors:  <none>
+Tolerations:     node.kubernetes.io/not-ready:NoExecute for 300s
+                 node.kubernetes.io/unreachable:NoExecute for 300s
+Events:
+  Type     Reason            Age                   From               Message
+  ----     ------            ----                  ----               -------
+  Warning  FailedScheduling  3m50s (x329 over 8h)  default-scheduler  0/2 nodes are available: 2 node(s) didn't match node selector.
+
+kubectl get pvc -n binderhub
+
+NAME         STATUS    VOLUME   CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+hub-db-dir   Pending                                                     8h
+
+Name:          hub-db-dir
+Namespace:     binderhub
+StorageClass:  
+Status:        Pending
+Volume:        
+Labels:        app=jupyterhub
+               chart=jupyterhub-0.9.0-beta.2
+               component=hub
+               heritage=Tiller
+               release=neurolibre
+Annotations:   <none>
+Finalizers:    [kubernetes.io/pvc-protection]
+Capacity:      
+Access Modes:  
+VolumeMode:    Filesystem
+Events:
+  Type       Reason         Age                  From                         Message
+  ----       ------         ----                 ----                         -------
+  Normal     FailedBinding  37s (x1963 over 8h)  persistentvolume-controller  no persistent volumes available for this claim and no storage class is set
+Mounted By:  hub-5578c5b89b-w5xdj
+
+kubectl describe certificates -n binderhub
+
+Message:               Waiting for CertificateRequest "neurolibre-binder-tls-1850857680" to complete
+    Reason:                InProgress
+    Status:                False

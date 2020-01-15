@@ -1,0 +1,69 @@
+rbac:
+  enabled: true
+
+letsencrypt:
+  contactEmail: redacted@example.com 
+
+binderhub:
+  config:
+    BinderHub:
+      use_registry: true
+      auth_enabled: true
+
+      template_path: /etc/binderhub/custom/templates
+      extra_static_path: /etc/binderhub/custom/static
+      extra_static_url_prefix: /extra_static/
+      template_variables:
+        EXTRA_STATIC_URL_PREFIX: "/extra_static/"
+
+  service:
+    type: ClusterIP
+
+  ingress:
+    enabled: true
+    annotations:
+      # cert-manager provides a TLS secret
+      # This will ask cert-manager to be configured with default values. It's better to configure default values.
+      kubernetes.io/tls-acme: "true"
+      # nginx-ingress controller to be explicitly utilised instead of "gce"
+      # This is required to allow nginx-ingress-controller to function. This will override any cloud provided ingress controllers and use the one we choose to deploy, i.e. nginx.
+      kubernetes.io/ingress.class: nginx
+      https:
+        enabled: true
+        type: nginx
+    hosts:
+      - binder.conp.cloud
+    tls:
+      - secretName: neurolibre-binder-tls
+        hosts:
+          - binder.conp.cloud
+
+    proxy:
+      service:
+        type: ClusterIP
+
+    ingress:
+      enabled: true
+      annotations:
+        kubernetes.io/tls-acme: "true"
+        kubernetes.io/ingress.class: nginx
+        https:
+          enabled: true
+          type: nginx
+      hosts:
+        - hub.conp.cloud
+      tls:
+        - secretName: neurolibre-hub-tls
+          hosts:
+            - hub.conp.cloud
+
+nginx-ingress:
+  controller:
+    config:
+      proxy-body-size: 64m
+
+cert-manager:
+  ingressShim:
+    defaultIssuerName: "staging"
+    defaultIssuerKind: "ClusterIssuer"
+    defaultACMEChallengeType: "http01"

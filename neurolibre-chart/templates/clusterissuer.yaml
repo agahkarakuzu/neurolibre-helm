@@ -1,0 +1,40 @@
+---
+apiVersion: cert-manager.io/v1alpha2
+kind: ClusterIssuer
+metadata:
+  name: prod
+  labels:
+    helm.sh/chart: {{ include "neurolibre-chart.chart" . }}
+    app.kubernetes.io/name: {{ include "neurolibre-chart.name" . }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: {{ .Values.letsencrypt.contactEmail }}
+    privateKeySecretRef:
+      name: prod-acme-key
+    solvers:
+    - http01:
+        ingress:
+          class: nginx
+---
+apiVersion: cert-manager.io/v1alpha2
+kind: ClusterIssuer
+metadata:
+  name: staging
+  labels:
+    helm.sh/chart: {{ include "neurolibre-chart.chart" . }}
+    app.kubernetes.io/name: {{ include "neurolibre-chart.name" . }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+spec:
+  acme:
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    email: {{ .Values.letsencrypt.contactEmail }}
+    privateKeySecretRef:
+      name: staging-acme-key
+    solvers:
+    - http01:
+        ingress:
+          class: nginx

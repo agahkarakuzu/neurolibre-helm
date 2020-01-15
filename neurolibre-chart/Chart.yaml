@@ -1,0 +1,4 @@
+apiVersion: v1
+name: neurolibre-chart
+version: 0.0.1
+description: A meta-chart for the BinderHub deployment on CC

@@ -1,0 +1,65 @@
+projectName: neurolibre
+
+binderhub:
+  config:
+    BinderHub:
+      image_prefix: conpdev/binder-agah-test.conp.cloud-
+      hub_url: https://hub.conp.cloud
+      use_named_servers: true
+      
+  jupyterhub:
+    cull:
+      every: 660
+      timeout: 600
+      maxAge: 21600  # maxAge is 6 hours: 6 * 3600 = 21600
+
+    hub:
+      allowNamedServers: true
+      redirectToServer: false
+      extraVolumes:
+      - name: shared-data
+        hostPath:
+          path: /DATA
+    extraVolumeMounts:
+      - name: shared-data
+        mountPath: /srv/jupyterhub/data
+
+    singleuser:
+      cmd: jupyterhub-singleuser
+      memory:
+        limit: 1G
+        guarantee: 1G
+      cpu:
+        limit: .5
+        guarantee: .5
+      storage:
+      extraVolumes:
+      - name: shared-data
+        hostPath:
+          path: /DATA
+      extraVolumeMounts:
+      - name: shared-data
+        mountPath: /home/jovyan/data  # where each user can reach shared data
+        readOnly : true
+
+    prePuller:
+      continuous:
+        enabled: true
+
+    scheduling:
+      podPriority:
+        enabled: true
+      userPlaceholder:
+        replicas: 3
+      userScheduler:
+        enabled: true
+      corePods:
+        nodeAffinity:
+          matchNodePurpose: require
+      userPods:
+        nodeAffinity:
+          matchNodePurpose: prefer
+
+cert-manager:
+  ingressShim:
+    defaultIssuerName: "staging"
