@@ -36,8 +36,21 @@ for `secrets.yaml` in the `deploy` folder.
 
 
 To install the chart:
+
 ```
-cd neurolibre-chart && helm dependency update && cd ..
+cd neurolibre-chart 
+```
+* Update Helm dependencies described in `requirements.txt` 
+```
+helm dependency update 
+```
+* Create persistent volume 
+```
+kubectl apply -f pv.yaml
+```
+* Install 
+```
+cd ..
 sudo helm install ./neurolibre-chart --name=neurolibre --namespace=binderhub -f config.yaml -f secret.yaml
 ```
 
@@ -51,6 +64,13 @@ To package the chart:
 ```
 helm package neurolibre-chart
 ```
+
+## To delete 
+```
+helm del --purge neurolibre
+```
+
+
 ## Current limitations on our OpenStack API 
 
 * We don't have a `LoadBalancer` API and implementation available. See more 

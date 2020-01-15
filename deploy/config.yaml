@@ -42,24 +42,6 @@ binderhub:
         mountPath: /home/jovyan/data  # where each user can reach shared data
         readOnly : true
 
-    prePuller:
-      continuous:
-        enabled: true
-
-    scheduling:
-      podPriority:
-        enabled: true
-      userPlaceholder:
-        replicas: 3
-      userScheduler:
-        enabled: true
-      corePods:
-        nodeAffinity:
-          matchNodePurpose: require
-      userPods:
-        nodeAffinity:
-          matchNodePurpose: prefer
-
 cert-manager:
   ingressShim:
     defaultIssuerName: "staging"
