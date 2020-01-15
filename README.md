@@ -1,9 +1,12 @@
 ## Before install 
 
-* Make sure that you have CRD for `cert-manager` `v0.11.1`. 
+* Fill in reducted entries in the following files:
+    - `values.yaml`
+
+* Make sure that you have CRD for `cert-manager` `v0.13.1`. 
 
 ```
-kubectl apply --validate=false -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.12/deploy/manifests/00-crds.yaml
+kubectl apply --validate=false -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.13/deploy/manifests/00-crds.yaml
 ```
 
 With `cert-manager > v0.11.0`, use the following `API version` in `clusterissuer.yaml`: 
@@ -53,7 +56,14 @@ kubectl apply -f pv.yaml
 cd ..
 sudo helm install ./neurolibre-chart --name=neurolibre --namespace=binderhub -f config.yaml -f secret.yaml
 ```
+## Some useful monitoring commands
 
+* To see what's going on with `cert-manager`. It may take a while (1-2m) for the
+following resources to be available.
+
+```
+kubectl describe clusterissuer,certificate,order,challenge -n binderhub
+```
 ## Upgrading the Chart
 
 sudo helm upgrade neurolibre ./neurolibre-chart --namespace=binderhub -f config.yaml -f secret.yaml
@@ -93,6 +103,8 @@ https://zero-to-jupyterhub.readthedocs.io/en/latest/administrator/advanced.html#
 
 * https://github.com/jupyterhub/zero-to-jupyterhub-k8s/issues/641
 
+# Potentially useful
 
+https://stackoverflow.com/questions/49845021/getting-an-kubernetes-ingress-endpoint-ip-address
 
 
